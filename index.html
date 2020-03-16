@@ -1,0 +1,106 @@
+<!doctype html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>dingtalk webhook</title>
+	<link rel="stylesheet" href="index.css">
+
+	<link rel="stylesheet" href="static/jsoneditor/v8.min.css">
+
+</head>
+
+<body>
+	<div class="container">
+		<section class="main">
+			<input class="token" id="token" type="text" placeholder="access_token">
+			<div class="way">
+				<select name="type" id="type">
+					<option value="text">Text</option>
+					<option value="link">Link</option>
+					<option value="markdown">Markdown</option>
+					<option value="manyActionCard">ActionCard(整体)</option>
+					<option value="signleActionCard">ActionCard(独立)</option>
+					<option value="feedCard">FeedCard</option>
+				</select>
+				<a href="https://ding-doc.dingtalk.com/doc#/serverapi2/qf2nxq">参考文档</a>
+			</div>
+			<div id="jsoneditor"></div>
+			<button id="sendBtn">send</button>
+		</section>
+		<footer>More: https://github.com/gozeon</footer>
+	</div>
+</body>
+
+<script>
+	require('./utils/link.js')
+</script>
+<script src="static/jsoneditor/v8.min.js"></script>
+<script>
+	// create the editor
+	const container = document.getElementById("jsoneditor")
+	const options = {
+		mode: 'tree',
+		modes: ['code', 'form', 'text', 'tree', 'view', 'preview'],
+	}
+	const editor = new JSONEditor(container, options)
+
+	// set json
+	const tplData = require("./template.json")
+	editor.set(tplData['text'])
+
+	// get json
+	const updatedJson = editor.get()
+
+	const typeEl = document.querySelector('#type')
+	typeEl.addEventListener('change', function (e) {
+		editor.set(tplData[e.target.value])
+	}, false)
+
+	let pre_data;
+	document.querySelector('#sendBtn').addEventListener('click', function (e) {
+		const token = document.querySelector('#token').value
+		if (!token) {
+			alert('access_token Is Null!')
+			return
+		}
+
+		const data_target = token + JSON.stringify(editor.get())
+
+		if (pre_data === data_target) {
+			if (confirm("再发一次？")) {
+				request(token)
+			}
+		} else {
+			request(token)
+		}
+
+	}, false)
+
+	function request(token, ) {
+		fetch(`https://oapi.dingtalk.com/robot/send?access_token=${token}`, {
+			method: "POST",
+			headers: {
+				'Accept': 'application/json',
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(editor.get())
+		}).then(response => {
+			if (!response.ok) {
+				throw new Error(response.statusText)
+			}
+			return response.json()
+		}).then(response => {
+			if (response['errcode'] !== 0) {
+				alert(response['errmsg'])
+			} else {
+				pre_data = token + JSON.stringify(editor.get())
+				alert('send success')
+			}
+		}).catch(err => {
+			alert(err.message)
+		})
+	}
+</script>
+
+</html>

@@ -1,0 +1,8 @@
+{
+  "generator-electron": {
+    "promptValues": {
+      "githubUsername": "gozeon",
+      "website": "https://github.com/gozeon"
+    }
+  }
+}

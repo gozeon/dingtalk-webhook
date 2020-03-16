@@ -1,0 +1,44 @@
+html,body {
+	margin: 0;
+	font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+	font-size: 16px;
+}
+
+footer {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	padding: 0 1rem;
+	line-height: 20px;
+	height: 20px;
+	font-size: 0.7rem;
+	text-align: right;
+	background-color: aliceblue;
+}
+
+.main {
+	height: 90vh;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: space-around;
+}
+
+.main .token {
+	height: 20px;
+	width: calc(90% - 5px);
+}
+
+.main .way {
+	width: 90%;
+}
+
+.main .way a {
+	font-size: 0.75rem;
+}
+
+.main #jsoneditor {
+	height: 60vh;
+	width: 90%;
+}
