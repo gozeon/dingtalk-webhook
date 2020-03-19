@@ -78,6 +78,12 @@
 			]
 		},
 		"msgtype": "feedCard"
+	},
+
+	"editor": {
+		"text": "\"痴\"这个字，真有趣，明是知道是病，依然痴心不改",
+		"markdown": "# 推荐文章\n\n- []()\n- []()\n- []()",
+		"signleActionCard": "![screenshot](@lADOpwk3K80C0M0FoA)\n### 乔布斯 20 年前想打造的苹果咖啡厅\nApple Store 设计正从原来满满的科技感走向生活化，而其生活化的走向其实可以追溯到 20 年前苹果一个建立咖啡馆的计划"
 	}
 }
 

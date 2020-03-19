@@ -5,102 +5,169 @@
 	<meta charset="utf-8">
 	<title>dingtalk webhook</title>
 	<link rel="stylesheet" href="index.css">
-
-	<link rel="stylesheet" href="static/jsoneditor/v8.min.css">
-
 </head>
 
 <body>
-	<div class="container">
-		<section class="main">
-			<input class="token" id="token" type="text" placeholder="access_token">
-			<div class="way">
-				<select name="type" id="type">
-					<option value="text">Text</option>
-					<option value="link">Link</option>
-					<option value="markdown">Markdown</option>
-					<option value="manyActionCard">ActionCard(整体)</option>
-					<option value="signleActionCard">ActionCard(独立)</option>
-					<option value="feedCard">FeedCard</option>
-				</select>
-				<a href="https://ding-doc.dingtalk.com/doc#/serverapi2/qf2nxq">参考文档</a>
-			</div>
-			<div id="jsoneditor"></div>
-			<button id="sendBtn">send</button>
-		</section>
+	<div class="container" id="root">
+		<div class="mb">
+			<input type="text" placeholder="Input url" v-model="url">
+		</div>
+
+		<select class="mb" v-model="way">
+			<option value="text">Text</option>
+			<option value="link">Link</option>
+			<option value="markdown">Markdown</option>
+			<option value="manyActionCard">ActionCard(整体)</option>
+			<option value="signleActionCard">ActionCard(独立)</option>
+			<option value="feedCard">FeedCard</option>
+		</select>
+		<a v-bind:href="dingDoc" v-on:click.stop.prevent="jumpBrowser">参考文档</a>
+
+		<div class="mb" id="container" style="min-height: 400px;"></div>
+
+		<div class="mb">
+			<input type="checkbox" v-model="isAtAll">Is @all ?
+		</div>
+
+		<button v-on:click="send">send</button>
+
 		<footer>More: https://github.com/gozeon</footer>
 	</div>
 </body>
 
 <script>
-	require('./utils/link.js')
-</script>
-<script src="static/jsoneditor/v8.min.js"></script>
-<script>
-	// create the editor
-	const container = document.getElementById("jsoneditor")
-	const options = {
-		mode: 'tree',
-		modes: ['code', 'form', 'text', 'tree', 'view', 'preview'],
-	}
-	const editor = new JSONEditor(container, options)
-
-	// set json
 	const tplData = require("./template.json")
-	editor.set(tplData['text'])
+</script>
+<script src="static/vue.js"></script>
+<script>
+		(function () {
+			const path = require('path');
+			const amdLoader = require('./node_modules/monaco-editor/min/vs/loader.js');
+			const amdRequire = amdLoader.require;
+			const amdDefine = amdLoader.require.define;
 
-	// get json
-	const updatedJson = editor.get()
-
-	const typeEl = document.querySelector('#type')
-	typeEl.addEventListener('change', function (e) {
-		editor.set(tplData[e.target.value])
-	}, false)
-
-	let pre_data;
-	document.querySelector('#sendBtn').addEventListener('click', function (e) {
-		const token = document.querySelector('#token').value
-		if (!token) {
-			alert('access_token Is Null!')
-			return
-		}
-
-		const data_target = token + JSON.stringify(editor.get())
-
-		if (pre_data === data_target) {
-			if (confirm("再发一次？")) {
-				request(token)
+			function uriFromPath(_path) {
+				var pathName = path.resolve(_path).replace(/\\/g, '/');
+				if (pathName.length > 0 && pathName.charAt(0) !== '/') {
+					pathName = '/' + pathName;
+				}
+				return encodeURI('file://' + pathName);
 			}
-		} else {
-			request(token)
-		}
 
-	}, false)
+			amdRequire.config({
+				baseUrl: uriFromPath(path.join(__dirname, './node_modules/monaco-editor/min'))
+			});
 
-	function request(token, ) {
-		fetch(`https://oapi.dingtalk.com/robot/send?access_token=${token}`, {
-			method: "POST",
-			headers: {
-				'Accept': 'application/json',
-				'Content-Type': 'application/json'
+			// workaround monaco-css not understanding the environment
+			self.module = undefined;
+
+			amdRequire(['vs/editor/editor.main'], function () {
+				window.monaco = monaco
+				window.editor = monaco.editor.create(document.getElementById('container'), {
+					value: JSON.stringify(tplData['text'], null, 2),
+					language: 'json'
+				});
+			});
+		})();
+</script>
+<script>
+	new Vue({
+		el: '#root',
+		data: {
+			dingDoc: 'https://ding-doc.dingtalk.com/doc#/serverapi2/qf2nxq',
+			way: 'text',
+			url: '',
+			isAtAll: false,
+			preData: ''
+		},
+		watch: {
+			way: function (val, oldVal) {
+				if (val === 'text') {
+					editor.setValue(JSON.stringify(tplData['text'], null, 2))
+					monaco.editor.setModelLanguage(monaco.editor.getModels()[0], 'json')
+				}
+				if (val === 'link') {
+					editor.setValue(JSON.stringify(tplData['link'], null, 2))
+					monaco.editor.setModelLanguage(monaco.editor.getModels()[0], 'json')
+				}
+				if (val === 'manyActionCard') {
+					editor.setValue(JSON.stringify(tplData['manyActionCard'], null, 2))
+					monaco.editor.setModelLanguage(monaco.editor.getModels()[0], 'json')
+				}
+				if (val === 'signleActionCard') {
+					editor.setValue(JSON.stringify(tplData['signleActionCard'], null, 2))
+					monaco.editor.setModelLanguage(monaco.editor.getModels()[0], 'json')
+				}
+				if (val === 'feedCard') {
+					editor.setValue(JSON.stringify(tplData['feedCard'], null, 2))
+					monaco.editor.setModelLanguage(monaco.editor.getModels()[0], 'json')
+				}
+
+				if (val === 'markdown') {
+					editor.setValue(tplData['editor']['markdown'])
+					monaco.editor.setModelLanguage(monaco.editor.getModels()[0], 'markdown')
+				}
+			}
+		},
+		methods: {
+			jumpBrowser: function () {
+				require('electron').shell.openExternal(this.dingDoc)
 			},
-			body: JSON.stringify(editor.get())
-		}).then(response => {
-			if (!response.ok) {
-				throw new Error(response.statusText)
+			send: function () {
+				if (!this.url) {
+					alert('Url Is Null!')
+					return
+				}
+				let data = editor.getValue()
+				if (this.way === 'markdown') {
+					data = {
+						"msgtype": "markdown",
+						"markdown": {
+							title: '😊',
+							text: data
+						},
+						"at": {
+							"isAtAll": this.isAtAll
+						}
+					}
+				} else {
+					data = Object.assign({}, JSON.parse(data), { at: { isAtAll: this.isAtAll } })
+				}
+
+				const body = JSON.stringify(data)
+				const targetData = this.url + body
+
+				if (this.preData === targetData) {
+					if (!confirm("再发一次？")) {
+						return
+					}
+				}
+
+				fetch(this.url, {
+					method: "POST",
+					headers: {
+						'Accept': 'application/json',
+						'Content-Type': 'application/json'
+					},
+					body: body
+				}).then(response => {
+					if (!response.ok) {
+						throw new Error(response.statusText)
+					}
+					return response.json()
+				}).then(response => {
+					if (response['errcode'] !== 0) {
+						alert(response['errmsg'])
+					} else {
+						this.preData = targetData
+						alert('send success')
+					}
+				}).catch(err => {
+					alert(err.message)
+				})
 			}
-			return response.json()
-		}).then(response => {
-			if (response['errcode'] !== 0) {
-				alert(response['errmsg'])
-			} else {
-				pre_data = token + JSON.stringify(editor.get())
-				alert('send success')
-			}
-		}).catch(err => {
-			alert(err.message)
-		})
-	}
+		}
+	})
 </script>
 
 </html>

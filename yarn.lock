@@ -3197,6 +3197,11 @@ modify-filename@^1.1.0:
   resolved "https://registry.npm.taobao.org/modify-filename/download/modify-filename-1.1.0.tgz#9a2dec83806fbb2d975f22beec859ca26b393aa1"
   integrity sha1-mi3sg4Bvuy2XXyK+7IWcoms5OqE=
 
+monaco-editor@^0.20.0:
+  version "0.20.0"
+  resolved "https://registry.npm.taobao.org/monaco-editor/download/monaco-editor-0.20.0.tgz#5d5009343a550124426cb4d965a4d27a348b4dea"
+  integrity sha1-XVAJNDpVASRCbLTZZaTSejSLTeo=
+
 ms@2.0.0:
   version "2.0.0"
   resolved "https://registry.npm.taobao.org/ms/download/ms-2.0.0.tgz?cache=0&sync_timestamp=1559842528856&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fms%2Fdownload%2Fms-2.0.0.tgz#5608aeadfc00be6c2901df5f9861788de0d597c8"

@@ -1,7 +1,5 @@
-html,body {
-	margin: 0;
-	font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
-	font-size: 16px;
+.container {
+	padding: 5px 8px;
 }
 
 footer {
@@ -17,28 +15,10 @@ footer {
 	background-color: aliceblue;
 }
 
-.main {
-	height: 90vh;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: space-around;
+input[type="text"] {
+	width: 100%;
 }
 
-.main .token {
-	height: 20px;
-	width: calc(90% - 5px);
-}
-
-.main .way {
-	width: 90%;
-}
-
-.main .way a {
-	font-size: 0.75rem;
-}
-
-.main #jsoneditor {
-	height: 60vh;
-	width: 90%;
+.mb {
+	margin-bottom: 14px;
 }
